@@ -1,0 +1,10 @@
+<?php
+$redirectUrl =  $block->getData('redirectUrl');
+?>
+<script>
+    <?php if (isset($redirectUrl)) : ?>
+    window.top.location.href="<?= $block->escapeUrl($redirectUrl) ?>";
+    <?php endif; ?>
+</script>
+
+

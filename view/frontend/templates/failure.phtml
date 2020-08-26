@@ -1,0 +1,18 @@
+<div class="checkout-success">
+    <p>
+        <?php
+            $objHostedFailure = $this->getHostedFailureMessage();
+            if (isset($objHostedFailure['orderid'])) {
+                echo $block->escapeHtml(__('Your Order #') . $objHostedFailure['orderid']);
+            }
+            if (isset($objHostedFailure['hostedfailure']['status'])) {
+                echo $block->escapeHtml(__(' is ') . strtolower($objHostedFailure['hostedfailure']['status']));
+            }
+            if (isset($objHostedFailure['hostedfailure']['reason_message'])) {
+                echo $block->escapeHtml(__(' because of ') . $objHostedFailure['hostedfailure']['reason_message']);
+            }
+        ?>
+    </p>
+</div>
+
+

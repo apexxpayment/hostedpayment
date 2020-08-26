@@ -1,0 +1,112 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="apexx_section">
+                <group id="apexxpayment">
+                    <group id="hostedpayment_gateway" translate="label" type="text" sortOrder="15"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Hosted Payment Settings</label>
+                        <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/hostedpayment_gateway/active</config_path>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1"
+                               showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/hostedpayment_gateway/title</config_path>
+                        </field>
+                        <field id="payment_action" translate="label" type="select" sortOrder="10"
+                               showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Payment Action</label>
+                            <source_model>Apexx\HostedPayment\Model\Adminhtml\Source\PaymentAction</source_model>
+                            <config_path>payment/hostedpayment_gateway/payment_action</config_path>
+                        </field>
+                        <field id="dynamic_descriptor" translate="label" type="text" sortOrder="11"
+                               showInDefault="1" showInWebsite="1" showInStore="0">
+                             <label>Dynamic Descriptor</label>
+                             <config_path>payment/hostedpayment_gateway/dynamic_descriptor</config_path>
+                        </field>
+                        <field id="redirect_url" translate="label" type="text" sortOrder="12"
+                               showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Redirect URL</label>
+                            <comment>Enter URL like http://yourdomain.com/apexxhosted/index/response</comment>
+                        </field>
+                        <field id="transaction_type" translate="label" type="text" sortOrder="14"
+                               showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Transaction Type</label>
+                        </field>
+                        <field id="allow" translate="label" type="multiselect" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Allowed Currencies</label>
+                            <source_model>Magento\Config\Model\Config\Source\Locale\Currency</source_model>
+                            <backend_model>Magento\Config\Model\Config\Backend\Currency\Allow</backend_model>
+                        </field>
+                             <field id="iframe_height" translate="label" type="text" sortOrder="16"
+                                   showInDefault="1" showInWebsite="1" showInStore="0">
+                                <label>Iframe Height</label>
+                                <config_path>payment/hostedpayment_gateway/iframe_height</config_path>
+                            </field>
+                            <field id="iframe_width" translate="label" type="text" sortOrder="16"
+                                   showInDefault="1" showInWebsite="1" showInStore="0">
+                                <label>Iframe Width</label>
+                                <config_path>payment/hostedpayment_gateway/iframe_width</config_path>
+                            </field>
+                            <field id="card_holder_name" translate="label" type="select" sortOrder="17"
+                                   showInDefault="1" showInWebsite="1" showInStore="0">
+                                <label>Show Card Holder Name</label>
+                                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            </field>
+                            <field id="address" translate="label" type="select" sortOrder="18"
+                                   showInDefault="1" showInWebsite="1" showInStore="0">
+                                <label>Show Address</label>
+                                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            </field>
+                            <field id="address_required" translate="label" type="select" sortOrder="23"
+                                   showInDefault="1" showInWebsite="1" showInStore="0">
+                                <label>Show Address Required</label>
+                                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            </field>
+                            <field id="display_horizontal" translate="label" type="select" sortOrder="24"
+                                   showInDefault="1" showInWebsite="1" showInStore="0">
+                                <label>Display Horizontal</label>
+                                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            </field>
+                            <field id="expiry_date" translate="label" type="text" sortOrder="25"
+                                   showInDefault="1" showInWebsite="1" showInStore="0">
+                                <label>Expiry Date</label>
+                            </field>
+                            <field id="cvv" translate="label" type="text" sortOrder="26"
+                                   showInDefault="1" showInWebsite="1" showInStore="0">
+                                <label>CVV</label>
+                                <config_path>payment/hostedpayment_gateway/cvv</config_path>
+                            </field>
+                            <field id="order_summary" translate="label" type="select" sortOrder="27"
+                                   showInDefault="1" showInWebsite="1" showInStore="0">
+                                <label>Show Order Summary</label>
+                                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            </field>
+                            <field id="transaction_css_template" translate="label" type="textarea" sortOrder="28"
+                                   showInDefault="1" showInWebsite="1" showInStore="0">
+                                <label>Transaction CSS</label>
+                            </field>
+                            <field id="three_d_status" translate="label" type="select" sortOrder="31"
+                                   showInDefault="1" showInWebsite="1" showInStore="0">
+                                <label>3DS Preference</label>
+                                <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            </field>
+                            <field id="webhook_transaction_update" translate="label" type="text" sortOrder="32"
+                                   showInDefault="1" showInWebsite="1" showInStore="0">
+                                <label>Webhook Transaction Update</label>
+                            </field>
+                            <field id="sort_order" translate="label" type="text" sortOrder="38" showInDefault="1" showInWebsite="1" showInStore="0">
+                                <label>Sort Order</label>
+                                <frontend_class>validate-number</frontend_class>
+                                <config_path>payment/hostedpayment_gateway/sort_order</config_path>
+                            </field>
+                    </group>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

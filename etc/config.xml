@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <hostedpayment_gateway>
+                <active>0</active>
+                <model>HostedPaymentFacade</model>
+                <title>Apexx Hosted Payment</title>
+                <payment_action>authorize</payment_action>
+                <dynamic_descriptor>Demo Merchant Test Purchase</dynamic_descriptor>
+                <cvv>3 digits on back</cvv>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <can_capture_partial>1</can_capture_partial>
+                <can_void>1</can_void>
+                <can_cancel>1</can_cancel>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_refund>1</can_refund>
+                <can_use_checkout>1</can_use_checkout>
+                <is_gateway>1</is_gateway>
+                <order_status>pending</order_status>
+                <paymentInfoKeys>card_number,expiry_month,expiry_year,status,amount,authorization_code</paymentInfoKeys>
+                <sort_order>15</sort_order>
+            </hostedpayment_gateway>
+        </payment>
+    </default>
+</config>
