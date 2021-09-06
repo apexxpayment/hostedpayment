@@ -86,8 +86,8 @@ class AuthorizationRequest implements BuilderInterface
             "currency" => $this->checkoutSession->getQuote()->getQuoteCurrencyCode(),
             "capture_now" => $this->hostedPaymentHelper->getHostedPaymentAction(),
             "dynamic_descriptor" => $this->hostedPaymentHelper->getDynamicDescriptor(),
-            "merchant_reference" => 'JOURNEYBOX'.$order->getOrderIncrementId(),
-            "return_url" => $this->hostedPaymentHelper->getReturnUrl(),
+            "merchant_reference" => $order->getOrderIncrementId(),
+            "return_url" => $this->apexxBaseHelper->getStoreUrl().'apexxhosted/index/response',
             "webhook_transaction_update" => $this->hostedPaymentHelper->getWebhookUrl(),
             "transaction_type" => $this->hostedPaymentHelper->getTransType(),
             "locale" => $this->apexxBaseHelper->getStoreLocale(),
@@ -100,10 +100,11 @@ class AuthorizationRequest implements BuilderInterface
                 "state" => $billing->getRegionCode(),
                 "postal_code" => $billing->getPostcode(),
                 "country" => $billing->getCountryId(),
-                "phone" => $billing->getTelephone()
+                "phone" => preg_replace('/[^\dxX]/', '', $billing->getTelephone())
             ],
             "three_ds" => [
-                "three_ds_required" => $this->hostedPaymentHelper->getThreeDsRequired()
+                "three_ds_required" => $this->hostedPaymentHelper->getThreeDsRequired(),
+                "three_ds_version" => $this->hostedPaymentHelper->getThreeDsVersion()
             ],
             "show_custom_fields" => [
                 "card_holder_name" => $this->hostedPaymentHelper->getCardHolderName(),
@@ -118,7 +119,6 @@ class AuthorizationRequest implements BuilderInterface
             "show_order_summary" => $this->hostedPaymentHelper->getOrderSummary(),
             "transaction_css_template" => $this->hostedPaymentHelper->getCssTemplate()
         ];
-
         return $requestData;
     }
 }

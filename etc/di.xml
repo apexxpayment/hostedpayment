@@ -24,6 +24,7 @@
     <virtualType name="HostedPaymentCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
         <arguments>
             <argument name="commands" xsi:type="array">
+		<item name="initialize" xsi:type="string">Apexx\HostedPayment\Gateway\Command\InitializeCommand</item>
                 <item name="authorize" xsi:type="string">HostedPaymentAuthorizeCommand</item>
                 <item name="capture" xsi:type="string">HostedPaymentCaptureCommand</item>
                 <item name="cancel" xsi:type="string">HostedPaymentCancelCommand</item>
@@ -222,4 +223,7 @@
         <plugin name="apexx_hosted_payment_action"
                 type="Apexx\HostedPayment\Plugin\Method\ApexxAdapter" sortOrder="20"/>
     </type>
+    <!--<type name="Magento\Sales\Model\Order\Payment\State\CommandInterface">
+        <plugin name="apexx_set_order_status" type="Apexx\HostedPayment\Plugin\Model\Order\Payment\State\CommandInterface" />
+    </type>-->
 </config>

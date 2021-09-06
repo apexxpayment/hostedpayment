@@ -9,6 +9,7 @@
                 <payment_action>authorize</payment_action>
                 <dynamic_descriptor>Demo Merchant Test Purchase</dynamic_descriptor>
                 <cvv>3 digits on back</cvv>
+		        <can_initialize>1</can_initialize>
                 <can_authorize>1</can_authorize>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>

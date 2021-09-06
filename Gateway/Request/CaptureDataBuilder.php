@@ -98,8 +98,8 @@ class CaptureDataBuilder implements BuilderInterface
                 "amount" => $amount,
                 "capture_now" => $this->hostedPaymentHelper->getHostedPaymentAction(),
                 "dynamic_descriptor" => $this->hostedPaymentHelper->getDynamicDescriptor(),
-                "merchant_reference" => 'JOURNEYBOX'.$order->getOrderIncrementId(),
-                "return_url" => $this->hostedPaymentHelper->getReturnUrl(),
+                "merchant_reference" => $this->apexxBaseHelper->getStoreCode().$order->getOrderIncrementId(),
+                "return_url" => $this->apexxBaseHelper->getStoreUrl().'apexxhosted/index/response',
                 "webhook_transaction_update" => $this->hostedPaymentHelper->getWebhookUrl(),
                 "transaction_type" => $this->hostedPaymentHelper->getTransType(),
                 "locale" => $this->apexxBaseHelper->getStoreLocale(),
@@ -112,10 +112,11 @@ class CaptureDataBuilder implements BuilderInterface
                     "state" => $billing->getRegionCode(),
                     "postal_code" => $billing->getPostcode(),
                     "country" => $billing->getCountryId(),
-                    "phone" => $billing->getTelephone()
+                    "phone" => preg_replace('/[^\dxX]/', '', $billing->getTelephone())
                 ],
                 "three_ds" => [
-                    "three_ds_required" => $this->hostedPaymentHelper->getThreeDsRequired()
+                    "three_ds_required" => $this->hostedPaymentHelper->getThreeDsRequired(),
+                    "three_ds_version" => $this->hostedPaymentHelper->getThreeDsVersion()
                 ],
                 "show_custom_fields" => [
                     "card_holder_name" => $this->hostedPaymentHelper->getCardHolderName(),

@@ -14,6 +14,7 @@ use Magento\Checkout\Model\Session;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Psr\Log\LoggerInterface;
 use Magento\Sales\Model\Order\Payment\Transaction\Builder;
 use Apexx\HostedPayment\Helper\InvoiceGenerate as CustomInvoice;
@@ -91,6 +92,11 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
      */
     protected $customLogger;
 
+    /**
+     * @var OrderSender
+     */
+    protected $orderSender;
+
    /**
      * Response constructor.
      * @param Context $context
@@ -108,6 +114,7 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
      * @param CustomInvoice $customInvoice
      * @param SessionManagerInterface $sessionManager
      * @param CustomLogger $customLogger
+     * @param OrderSender $orderSender
      */
     public function __construct(
         Context $context,
@@ -124,7 +131,8 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
         Builder $transactionBuilder,
         CustomInvoice $customInvoice,
         SessionManagerInterface $sessionManager,
-        CustomLogger $customLogger
+        CustomLogger $customLogger,
+        OrderSender $orderSender
     )
     {
         parent::__construct($context);
@@ -142,6 +150,7 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
         $this->customInvoice = $customInvoice;
         $this->sessionManager = $sessionManager;
         $this->customLogger = $customLogger;
+        $this->orderSender = $orderSender;
 
     }
 
@@ -157,15 +166,18 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
             $status=$this->request->getParam("status");
             $reason_message=$this->request->getParam("reason_message");
             $amount = $this->request->getParam("amount");
-            $total = ($amount / 100);
+            $total = ((int)$amount / 100);
             $expiry_month = $this->request->getParam("expiry_month");
             $expiry_year = $this->request->getParam("expiry_year");
             $card_number = $this->request->getParam("card_number");
+            $incrId = $this->request->getParam("merchant_reference");
             $authorization_code = $this->request->getParam("authorization_code");
+            //$order = $this->checkoutSession->getLastRealOrder();
+            //$orderObj = $this->orderRepository->get($order->getId());
 
-            $order = $this->checkoutSession->getLastRealOrder();
+            $order = $this->order->loadByIncrementId($incrId);
+            //$orderId = $order->getId();
             $orderObj = $this->orderRepository->get($order->getId());
-
             /** @var \Magento\Sales\Model\Order\Payment $payment */
             $payment = $order->getPayment();
 
@@ -221,6 +233,9 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
                 // $order->setStatus('processing');
                 $order->setStatus('authorised');
                 $order->setState('processing');
+                if (!$order->getEmailSent()) {
+                    $this->orderSender->send($order);
+                }
                 $payment->save();
                 $order->save();
                 $transaction->save();
@@ -282,7 +297,10 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
                 $transaction->setIsClosed(true);
 
                 $payment->addTransactionCommentsToOrder($transaction, __('Captured amount of %1.', $order->getBaseCurrency()->formatTxt($total)));
-
+                
+                if (!$order->getEmailSent()) {
+                    $this->orderSender->send($order);
+                }
                 $payment->save();
                 $order->save();
                 $transaction->save();
@@ -312,11 +330,16 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
                 // $payment->addTransactionCommentsToOrder($transaction, __('Canceled order online %1.', $order->getBaseCurrency()->formatTxt($total)));
 
                 // $this->cancelTransactionOrder();
-
-                $orderStatus = strtolower($response['status']);
-                $order->setStatus($orderStatus);
-                
-                $order->save();
+                if(isset($response['status'])){
+                    $orderStatus = strtolower($response['status']);
+                    $order->setStatus($orderStatus);
+                    
+                    $order->save();
+                }
+                if(isset($response['message'])){
+                    $response['hostedfailure']['status']= 'failed';
+                    $response['hostedfailure']['reason_message']= $response['message'];
+                }
                 $payment->save();
               //  $transaction->save();
 

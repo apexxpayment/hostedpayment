@@ -56,9 +56,10 @@ class Data extends AbstractHelper
      * 3D Secure
      */
     const XML_PATH_3DS_STATUS = '/three_d_status';
+    const XML_PATH_3DS_VERSION = '/three_d_version';
     const XML_PATH_WEBHOOK_URL = '/webhook_transaction_update';
-     const XML_IFRAME_HEIGHT = '/iframe_height' ;
-     const XML_IFRAME_WIDTH = '/iframe_width' ;
+    const XML_IFRAME_HEIGHT = '/iframe_height' ;
+    const XML_IFRAME_WIDTH = '/iframe_width' ;
 
     /**
      * @var ScopeConfigInterface
@@ -223,6 +224,19 @@ class Data extends AbstractHelper
             return 'true';
         } else {
             return 'false';
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getThreeDsVersion()
+    {
+        $threeDVersion = $this->getConfigPathValue(self::XML_PATH_3DS_VERSION);
+        if ($threeDVersion) {
+            return $threeDVersion;
+        }else{
+            return '1.0';
         }
     }
 

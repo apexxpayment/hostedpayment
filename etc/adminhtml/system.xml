@@ -28,11 +28,11 @@
                              <label>Dynamic Descriptor</label>
                              <config_path>payment/hostedpayment_gateway/dynamic_descriptor</config_path>
                         </field>
-                        <field id="redirect_url" translate="label" type="text" sortOrder="12"
+                        <!--<field id="redirect_url" translate="label" type="text" sortOrder="12"
                                showInDefault="1" showInWebsite="1" showInStore="0">
                             <label>Redirect URL</label>
                             <comment>Enter URL like http://yourdomain.com/apexxhosted/index/response</comment>
-                        </field>
+                        </field>-->
                         <field id="transaction_type" translate="label" type="text" sortOrder="14"
                                showInDefault="1" showInWebsite="1" showInStore="0">
                             <label>Transaction Type</label>
@@ -42,11 +42,6 @@
                             <source_model>Magento\Config\Model\Config\Source\Locale\Currency</source_model>
                             <backend_model>Magento\Config\Model\Config\Backend\Currency\Allow</backend_model>
                         </field>
-                             <field id="iframe_height" translate="label" type="text" sortOrder="16"
-                                   showInDefault="1" showInWebsite="1" showInStore="0">
-                                <label>Iframe Height</label>
-                                <config_path>payment/hostedpayment_gateway/iframe_height</config_path>
-                            </field>
                             <field id="iframe_width" translate="label" type="text" sortOrder="16"
                                    showInDefault="1" showInWebsite="1" showInStore="0">
                                 <label>Iframe Width</label>
@@ -94,6 +89,12 @@
                                    showInDefault="1" showInWebsite="1" showInStore="0">
                                 <label>3DS Preference</label>
                                 <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            </field>
+                            <field id="three_d_version" translate="label" type="select" sortOrder="31"
+                               showInDefault="1" showInWebsite="1" showInStore="0">
+                                <label>3DS Version</label>
+                                <source_model>Apexx\HostedPayment\Model\Adminhtml\Source\ThreedPreferencesVersion</source_model>
+                                <config_path>payment/hostedpayment_gateway/three_d_version</config_path>
                             </field>
                             <field id="webhook_transaction_update" translate="label" type="text" sortOrder="32"
                                    showInDefault="1" showInWebsite="1" showInStore="0">
