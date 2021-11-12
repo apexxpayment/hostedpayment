@@ -4,9 +4,6 @@
         <observer name="hostedpayment_payment_gateway_data_assign"
                   instance="Apexx\HostedPayment\Observer\DataAssignObserver" />
     </event>
-    <event name="sales_order_place_after">
-        <observer name="apexx_hostedpaypalpayments_place_order_after" instance="Apexx\HostedPayment\Observer\OrderObserver" />
-    </event>
     <!-- Restrict Paypal Payment method depends on currency -->
     <event name="payment_method_is_active">
         <observer name="restrict_hosted_payment_currency" instance="Apexx\HostedPayment\Observer\DisabledHostedCurrency" />

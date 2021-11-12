@@ -160,199 +160,215 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
     public function execute()
     {
         try {
-            $response = $this->request->getParams();
-            $this->customLogger->debug('Hostedpayment Success Response:', $response);
-            $transactionId = $response['_id'];
-            $status=$this->request->getParam("status");
-            $reason_message=$this->request->getParam("reason_message");
-            $amount = $this->request->getParam("amount");
-            $total = ((int)$amount / 100);
-            $expiry_month = $this->request->getParam("expiry_month");
-            $expiry_year = $this->request->getParam("expiry_year");
-            $card_number = $this->request->getParam("card_number");
-            $incrId = $this->request->getParam("merchant_reference");
-            $authorization_code = $this->request->getParam("authorization_code");
-            //$order = $this->checkoutSession->getLastRealOrder();
-            //$orderObj = $this->orderRepository->get($order->getId());
+            $post = $this->request->getPostValue();
+            if ($post) {
+                $response = $this->request->getParams();
+                $this->customLogger->debug('Hostedpayment Success Response:', $response);
+                $transactionId = $response['_id'];
+                $status=$this->request->getParam("status");
+                $reason_message=$this->request->getParam("reason_message");
+                $amount = $this->request->getParam("amount");
+                $total = ((int)$amount / 100);
+                $expiry_month = $this->request->getParam("expiry_month");
+                $expiry_year = $this->request->getParam("expiry_year");
+                $card_number = $this->request->getParam("card_number");
+                $incrId = $this->request->getParam("merchant_reference");
+                $authorization_code = $this->request->getParam("authorization_code");
+                //$order = $this->checkoutSession->getLastRealOrder();
+                //$orderObj = $this->orderRepository->get($order->getId());
 
-            $order = $this->order->loadByIncrementId($incrId);
-            //$orderId = $order->getId();
-            $orderObj = $this->orderRepository->get($order->getId());
-            /** @var \Magento\Sales\Model\Order\Payment $payment */
-            $payment = $order->getPayment();
+                $order = $this->order->loadByIncrementId($incrId);
+                //$orderId = $order->getId();
+                $orderObj = $this->orderRepository->get($order->getId());
+                /** @var \Magento\Sales\Model\Order\Payment $payment */
+                $payment = $order->getPayment();
 
-            if ($status == 'AUTHORISED') {
+                if ($status == 'AUTHORISED') {
 
-                $payment->setLastTransId($transactionId);
-                $payment->setParentTransactionId(null);
-                $payment->setCcType('VI');
-                $payment->setCcExpMonth($expiry_month);
-                $payment->setCcExpYear($expiry_year);
-                $payment->setCcNumberEnc($card_number);
-                $payment->setCcLast4(substr($card_number, -4));
-                $payment->setCcApproval($authorization_code);
-                // Set Response into sales_order_payment table
-                if (isset($response['reason_code'])) {
-                    $payment->setAdditionalInformation('reason_code', $response['reason_code']);
-                }
-                if (isset($response['_id'])) {
-                    $payment->setAdditionalInformation('_id', $response['_id']);
-                }
-                if (isset($response['authorization_code'])) {
-                    $payment->setAdditionalInformation('authorization_code', $response['authorization_code']);
-                }
-                if (isset($response['merchant_reference'])) {
-                    $payment->setAdditionalInformation('merchant_reference', $response['merchant_reference']);
-                }
-                if (isset($response['amount'])) {
-                    $payment->setAdditionalInformation('amount', $response['amount']);
-                }
-                if (isset($response['status'])) {
-                    $payment->setAdditionalInformation('status', $response['status']);
-                }
-                if (isset($response['card_number'])) {
-                    $payment->setAdditionalInformation('card_number', $response['card_number']);
-                }
-                if (isset($response['expiry_month'])) {
-                    $payment->setAdditionalInformation('expiry_month', $response['expiry_month']);
-                }
-                if (isset($response['expiry_year'])) {
-                    $payment->setAdditionalInformation('expiry_year', $response['expiry_year']);
-                }
+                    $payment->setLastTransId($transactionId);
+                    $payment->setParentTransactionId(null);
+                    $payment->setCcType('VI');
+                    $payment->setCcExpMonth($expiry_month);
+                    $payment->setCcExpYear($expiry_year);
+                    $payment->setCcNumberEnc($card_number);
+                    $payment->setCcLast4(substr($card_number, -4));
+                    $payment->setCcApproval($authorization_code);
+                    // Set Response into sales_order_payment table
+                    if (isset($response['reason_code'])) {
+                        $payment->setAdditionalInformation('reason_code', $response['reason_code']);
+                    }
+                    if (isset($response['_id'])) {
+                        $payment->setAdditionalInformation('_id', $response['_id']);
+                    }
+                    if (isset($response['authorization_code'])) {
+                        $payment->setAdditionalInformation('authorization_code', $response['authorization_code']);
+                    }
+                    if (isset($response['merchant_reference'])) {
+                        $payment->setAdditionalInformation('merchant_reference', $response['merchant_reference']);
+                    }
+                    if (isset($response['amount'])) {
+                        $payment->setAdditionalInformation('amount', $response['amount']);
+                    }
+                    if (isset($response['status'])) {
+                        $payment->setAdditionalInformation('status', $response['status']);
+                    }
+                    if (isset($response['card_number'])) {
+                        $payment->setAdditionalInformation('card_number', $response['card_number']);
+                    }
+                    if (isset($response['expiry_month'])) {
+                        $payment->setAdditionalInformation('expiry_month', $response['expiry_month']);
+                    }
+                    if (isset($response['expiry_year'])) {
+                        $payment->setAdditionalInformation('expiry_year', $response['expiry_year']);
+                    }
 
-                $transaction = $this->transactionBuilder->setPayment($payment)
-                    ->setOrder($order)
-                    ->setTransactionId($transactionId)
-                    ->addAdditionalInformation('raw_details_info', $response)
-                    ->setFailSafe(true)
-                    ->build('authorization');
-                $transaction->setIsClosed(false);
+                    $transaction = $this->transactionBuilder->setPayment($payment)
+                        ->setOrder($order)
+                        ->setTransactionId($transactionId)
+                        ->addAdditionalInformation('raw_details_info', $response)
+                        ->setFailSafe(true)
+                        ->build('authorization');
+                    $transaction->setIsClosed(false);
 
-                $payment->addTransactionCommentsToOrder($transaction, __('Authorized amount of %1.', $order->getBaseCurrency()->formatTxt($total)));
+                    $payment->addTransactionCommentsToOrder($transaction, __('Authorized amount of %1.', $order->getBaseCurrency()->formatTxt($total)));
 
-                // $order->setStatus('processing');
-                $order->setStatus('authorised');
-                $order->setState('processing');
-                if (!$order->getEmailSent()) {
-                    $this->orderSender->send($order);
-                }
-                $payment->save();
-                $order->save();
-                $transaction->save();
-
-                $redirectUrl = $this->urlInterface->getUrl() . 'checkout/onepage/success';
-                $resultPage = $this->pageFactory->create();
-                $block = $resultPage->getLayout()
-                    ->createBlock('Magento\Framework\View\Element\Template')
-                    ->setTemplate('Apexx_HostedPayment::redirect.phtml')
-                    ->setData('redirectUrl',$redirectUrl)
-                    ->toHtml();
-                $this->getResponse()->setBody($block);
-
-            } elseif ($status == 'CAPTURED') {
-                $payment->setLastTransId($transactionId);
-                $payment->setTransactionId($transactionId);
-                $payment->setIsTransactionClosed(true);
-                $payment->setCcType('VI');
-                $payment->setCcExpMonth($expiry_month);
-                $payment->setCcExpYear($expiry_year);
-                $payment->setCcNumberEnc($card_number);
-                $payment->setCcLast4(substr($card_number, -4));
-                $payment->setCcApproval($authorization_code);
-                // Set Response into sales_order_payment table
-                if (isset($response['reason_code'])) {
-                    $payment->setAdditionalInformation('reason_code', $response['reason_code']);
-                }
-                if (isset($response['_id'])) {
-                    $payment->setAdditionalInformation('_id', $response['_id']);
-                }
-                if (isset($response['authorization_code'])) {
-                    $payment->setAdditionalInformation('authorization_code', $response['authorization_code']);
-                }
-                if (isset($response['merchant_reference'])) {
-                    $payment->setAdditionalInformation('merchant_reference', $response['merchant_reference']);
-                }
-                if (isset($response['amount'])) {
-                    $payment->setAdditionalInformation('amount', $response['amount']);
-                }
-                if (isset($response['status'])) {
-                    $payment->setAdditionalInformation('status', $response['status']);
-                }
-                if (isset($response['card_number'])) {
-                    $payment->setAdditionalInformation('card_number', $response['card_number']);
-                }
-                if (isset($response['expiry_month'])) {
-                    $payment->setAdditionalInformation('expiry_month', $response['expiry_month']);
-                }
-                if (isset($response['expiry_year'])) {
-                    $payment->setAdditionalInformation('expiry_year', $response['expiry_year']);
-                }
-
-                $transaction = $this->transactionBuilder->setPayment($payment)
-                    ->setOrder($order)
-                    ->setTransactionId($transactionId)
-                    ->addAdditionalInformation('raw_details_info', $response)
-                    ->setFailSafe(true)
-                    ->build('capture');
-                $transaction->setIsClosed(true);
-
-                $payment->addTransactionCommentsToOrder($transaction, __('Captured amount of %1.', $order->getBaseCurrency()->formatTxt($total)));
-                
-                if (!$order->getEmailSent()) {
-                    $this->orderSender->send($order);
-                }
-                $payment->save();
-                $order->save();
-                $transaction->save();
-
-                $this->customInvoice->createInvoice($order->getId(), $total,$transactionId);
-
-                $redirectUrl = $this->urlInterface->getUrl() . 'checkout/onepage/success';
-                $resultPage = $this->pageFactory->create();
-                $block = $resultPage->getLayout()
-                    ->createBlock('Magento\Framework\View\Element\Template')
-                    ->setTemplate('Apexx_HostedPayment::redirect.phtml')
-                    ->setData('redirectUrl',$redirectUrl)
-                    ->toHtml();
-                $this->getResponse()->setBody($block);
-            } else {
-
-                $payment->setLastTransId($transactionId);
-                $payment->setTransactionId($transactionId);
-                // $transaction = $this->transactionBuilder->setPayment($payment)
-                //     ->setOrder($order)
-                //     ->setTransactionId($transactionId)
-                //     ->addAdditionalInformation('raw_details_info', $response)
-                //     ->setFailSafe(true)
-                //     ->build('void');
-                // $transaction->setIsClosed(true);
-
-                // $payment->addTransactionCommentsToOrder($transaction, __('Canceled order online %1.', $order->getBaseCurrency()->formatTxt($total)));
-
-                // $this->cancelTransactionOrder();
-                if(isset($response['status'])){
-                    $orderStatus = strtolower($response['status']);
-                    $order->setStatus($orderStatus);
-                    
+                    // $order->setStatus('processing');
+                    $order->setStatus('authorised');
+                    $order->setState('processing');
+                    if (!$order->getEmailSent()) {
+                        $this->orderSender->send($order);
+                    }
+                    $payment->save();
                     $order->save();
+                    $transaction->save();
+
+                    $redirectUrl = $this->urlInterface->getUrl() . 'checkout/onepage/success';
+                    $resultPage = $this->pageFactory->create();
+                    $block = $resultPage->getLayout()
+                        ->createBlock('Magento\Framework\View\Element\Template')
+                        ->setTemplate('Apexx_HostedPayment::redirect.phtml')
+                        ->setData('redirectUrl',$redirectUrl)
+                        ->toHtml();
+                    $this->getResponse()->setBody($block);
+
+                } elseif ($status == 'CAPTURED') {
+                    $payment->setLastTransId($transactionId);
+                    $payment->setTransactionId($transactionId);
+                    $payment->setIsTransactionClosed(true);
+                    $payment->setCcType('VI');
+                    $payment->setCcExpMonth($expiry_month);
+                    $payment->setCcExpYear($expiry_year);
+                    $payment->setCcNumberEnc($card_number);
+                    $payment->setCcLast4(substr($card_number, -4));
+                    $payment->setCcApproval($authorization_code);
+                    // Set Response into sales_order_payment table
+                    if (isset($response['reason_code'])) {
+                        $payment->setAdditionalInformation('reason_code', $response['reason_code']);
+                    }
+                    if (isset($response['_id'])) {
+                        $payment->setAdditionalInformation('_id', $response['_id']);
+                    }
+                    if (isset($response['authorization_code'])) {
+                        $payment->setAdditionalInformation('authorization_code', $response['authorization_code']);
+                    }
+                    if (isset($response['merchant_reference'])) {
+                        $payment->setAdditionalInformation('merchant_reference', $response['merchant_reference']);
+                    }
+                    if (isset($response['amount'])) {
+                        $payment->setAdditionalInformation('amount', $response['amount']);
+                    }
+                    if (isset($response['status'])) {
+                        $payment->setAdditionalInformation('status', $response['status']);
+                    }
+                    if (isset($response['card_number'])) {
+                        $payment->setAdditionalInformation('card_number', $response['card_number']);
+                    }
+                    if (isset($response['expiry_month'])) {
+                        $payment->setAdditionalInformation('expiry_month', $response['expiry_month']);
+                    }
+                    if (isset($response['expiry_year'])) {
+                        $payment->setAdditionalInformation('expiry_year', $response['expiry_year']);
+                    }
+
+                    $transaction = $this->transactionBuilder->setPayment($payment)
+                        ->setOrder($order)
+                        ->setTransactionId($transactionId)
+                        ->addAdditionalInformation('raw_details_info', $response)
+                        ->setFailSafe(true)
+                        ->build('capture');
+                    $transaction->setIsClosed(true);
+
+                    $payment->addTransactionCommentsToOrder($transaction, __('Captured amount of %1.', $order->getBaseCurrency()->formatTxt($total)));
+                    
+                    if (!$order->getEmailSent()) {
+                        $this->orderSender->send($order);
+                    }
+                    $payment->save();
+                    $order->save();
+                    $transaction->save();
+
+                    $this->customInvoice->createInvoice($order->getId(), $total,$transactionId);
+
+                    $redirectUrl = $this->urlInterface->getUrl() . 'checkout/onepage/success';
+                    $resultPage = $this->pageFactory->create();
+                    $block = $resultPage->getLayout()
+                        ->createBlock('Magento\Framework\View\Element\Template')
+                        ->setTemplate('Apexx_HostedPayment::redirect.phtml')
+                        ->setData('redirectUrl',$redirectUrl)
+                        ->toHtml();
+                    $this->getResponse()->setBody($block);
+                } else {
+
+                    $payment->setLastTransId($transactionId);
+                    $payment->setTransactionId($transactionId);
+                    // $transaction = $this->transactionBuilder->setPayment($payment)
+                    //     ->setOrder($order)
+                    //     ->setTransactionId($transactionId)
+                    //     ->addAdditionalInformation('raw_details_info', $response)
+                    //     ->setFailSafe(true)
+                    //     ->build('void');
+                    // $transaction->setIsClosed(true);
+
+                    // $payment->addTransactionCommentsToOrder($transaction, __('Canceled order online %1.', $order->getBaseCurrency()->formatTxt($total)));
+
+                    // $this->cancelTransactionOrder();
+                    if(isset($response['status'])){
+                        $orderStatus = strtolower($response['status']);
+                        $order->setStatus($orderStatus);
+                        
+                        $order->save();
+                    }
+                    if(isset($response['message'])){
+                        $response['hostedfailure']['status']= 'failed';
+                        $response['hostedfailure']['reason_message']= $response['message'];
+                    }
+                    $payment->save();
+                  //  $transaction->save();
+
+                    $this->setHostedFailureMessage($response,$order->getIncrementId());
+
+                    $redirectUrl = $this->urlInterface->getUrl() . 'apexxhosted/payment/failure';
+                    $resultPage = $this->pageFactory->create();
+                    $block = $resultPage->getLayout()
+                        ->createBlock('Magento\Framework\View\Element\Template')
+                        ->setTemplate('Apexx_HostedPayment::redirect.phtml')
+                        ->setData('redirectUrl',$redirectUrl)
+                        ->toHtml();
+                    $this->getResponse()->setBody($block);
                 }
-                if(isset($response['message'])){
+            }else{
                     $response['hostedfailure']['status']= 'failed';
-                    $response['hostedfailure']['reason_message']= $response['message'];
-                }
-                $payment->save();
-              //  $transaction->save();
+                    $response['hostedfailure']['reason_message']= "Wrong Data";
+                    $this->setHostedFailureMessage($response,'Wrong data - No Order');
+                    $redirectUrl = $this->urlInterface->getUrl() . 'apexxhosted/payment/failure';
+                    $resultPage = $this->pageFactory->create();
+                    $block = $resultPage->getLayout()
+                        ->createBlock('Magento\Framework\View\Element\Template')
+                        ->setTemplate('Apexx_HostedPayment::redirect.phtml')
+                        ->setData('redirectUrl',$redirectUrl)
+                        ->toHtml();
+                    $this->getResponse()->setBody($block);
 
-                $this->setHostedFailureMessage($response,$order->getIncrementId());
-
-                $redirectUrl = $this->urlInterface->getUrl() . 'apexxhosted/payment/failure';
-                $resultPage = $this->pageFactory->create();
-                $block = $resultPage->getLayout()
-                    ->createBlock('Magento\Framework\View\Element\Template')
-                    ->setTemplate('Apexx_HostedPayment::redirect.phtml')
-                    ->setData('redirectUrl',$redirectUrl)
-                    ->toHtml();
-                $this->getResponse()->setBody($block);
             }
 
         } catch (\Exception $e){
