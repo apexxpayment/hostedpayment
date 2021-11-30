@@ -76,8 +76,8 @@ class AuthorizationRequest implements BuilderInterface
         $payment = $buildSubject['payment'];
         $order= $payment->getOrder();
         $billing = $order->getBillingAddress();
-       $amount = $buildSubject['amount']*100;
-
+        $amount = $buildSubject['amount']*100;
+        $merchantReference = $this->apexxBaseHelper->encryptDecrypt(1, $order->getOrderIncrementId());
         $requestData= [
             //"account" => $this->apexxBaseHelper->getAccountId(),
             //"account" => '112ec893bb9d45cca5f521c750f97f5d',
@@ -86,7 +86,7 @@ class AuthorizationRequest implements BuilderInterface
             "currency" => $this->checkoutSession->getQuote()->getQuoteCurrencyCode(),
             "capture_now" => $this->hostedPaymentHelper->getHostedPaymentAction(),
             "dynamic_descriptor" => $this->hostedPaymentHelper->getDynamicDescriptor(),
-            "merchant_reference" => $order->getOrderIncrementId(),
+            "merchant_reference" => $merchantReference,
             "return_url" => $this->apexxBaseHelper->getStoreUrl().'apexxhosted/index/response',
             "webhook_transaction_update" => $this->hostedPaymentHelper->getWebhookUrl(),
             "transaction_type" => $this->hostedPaymentHelper->getTransType(),
@@ -108,9 +108,9 @@ class AuthorizationRequest implements BuilderInterface
             ],
             "show_custom_fields" => [
                 "card_holder_name" => $this->hostedPaymentHelper->getCardHolderName(),
-   		        "address" => $this->hostedPaymentHelper->getCardAddress(),
-   		        "address_required" => $this->hostedPaymentHelper->getCardAddReq(),
-   		        "display_horizontal" => $this->hostedPaymentHelper->getDisplayHorizontal()
+                "address" => $this->hostedPaymentHelper->getCardAddress(),
+                "address_required" => $this->hostedPaymentHelper->getCardAddReq(),
+                "display_horizontal" => $this->hostedPaymentHelper->getDisplayHorizontal()
             ],
             "show_custom_labels" => [
                 "expiry_date" => $this->hostedPaymentHelper->getCardExpiryDate(),

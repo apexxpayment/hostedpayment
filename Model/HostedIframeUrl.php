@@ -130,14 +130,14 @@ class HostedIframeUrl implements \Apexx\HostedPayment\Api\HostedIframeUrlInterfa
     public function getRequestData($order){
         $billing = $order->getBillingAddress();
         $amount = $order->getGrandTotal()*100;
-
+        $merchantReference = $this->apexxBaseHelper->encryptDecrypt(1, $order->getIncrementId());
         $requestData= [
             "organisation" => $this->apexxBaseHelper->getOrganizationId(),
             "amount" => $amount,
             "currency" => $order->getStoreCurrencyCode(),
             "capture_now" => $this->hostedPaymentHelper->getHostedPaymentAction(),
             "dynamic_descriptor" => $this->hostedPaymentHelper->getDynamicDescriptor(),
-            "merchant_reference" => $order->getIncrementId(),
+            "merchant_reference" => $merchantReference,
             "return_url" => $this->apexxBaseHelper->getStoreUrl().'apexxhosted/index/response',
             "webhook_transaction_update" => $this->hostedPaymentHelper->getWebhookUrl(),
             "transaction_type" => $this->hostedPaymentHelper->getTransType(),

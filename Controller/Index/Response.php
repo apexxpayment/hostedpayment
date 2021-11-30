@@ -20,6 +20,7 @@ use Magento\Sales\Model\Order\Payment\Transaction\Builder;
 use Apexx\HostedPayment\Helper\InvoiceGenerate as CustomInvoice;
 use Magento\Framework\Session\SessionManagerInterface;
 use Apexx\Base\Helper\Logger\Logger as CustomLogger;
+use Apexx\Base\Helper\Data as ApexxBaseHelper;
 
 /**
  * Class Response
@@ -97,6 +98,11 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
      */
     protected $orderSender;
 
+    /**
+     * @var ApexxBaseHelper
+     */
+    protected  $apexxBaseHelper;
+
    /**
      * Response constructor.
      * @param Context $context
@@ -115,6 +121,7 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
      * @param SessionManagerInterface $sessionManager
      * @param CustomLogger $customLogger
      * @param OrderSender $orderSender
+     * @param ApexxBaseHelper $apexxBaseHelper
      */
     public function __construct(
         Context $context,
@@ -132,7 +139,8 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
         CustomInvoice $customInvoice,
         SessionManagerInterface $sessionManager,
         CustomLogger $customLogger,
-        OrderSender $orderSender
+        OrderSender $orderSender,
+        ApexxBaseHelper $apexxBaseHelper
     )
     {
         parent::__construct($context);
@@ -151,7 +159,7 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
         $this->sessionManager = $sessionManager;
         $this->customLogger = $customLogger;
         $this->orderSender = $orderSender;
-
+        $this->apexxBaseHelper = $apexxBaseHelper;
     }
 
     /**
@@ -172,7 +180,9 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
                 $expiry_month = $this->request->getParam("expiry_month");
                 $expiry_year = $this->request->getParam("expiry_year");
                 $card_number = $this->request->getParam("card_number");
-                $incrId = $this->request->getParam("merchant_reference");
+                $encryptId = $this->request->getParam("merchant_reference");
+                $paymentStr = $this->apexxBaseHelper->encryptDecrypt(2, $encryptId);
+                $incrId = str_replace('hosted',"",$paymentStr);
                 $authorization_code = $this->request->getParam("authorization_code");
                 //$order = $this->checkoutSession->getLastRealOrder();
                 //$orderObj = $this->orderRepository->get($order->getId());
