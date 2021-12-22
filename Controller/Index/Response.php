@@ -169,8 +169,25 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
     {
         try {
             $post = $this->request->getPostValue();
+
             if ($post) {
                 $response = $this->request->getParams();
+                
+                //Signature from response
+                $responseSign = $response['signature'];
+
+                //Remove Signature parameter from response
+                unset($response['signature']);
+                
+                //Sort the response in ascending order
+                ksort($response);
+                
+                //Encode the response
+                $data = json_encode($response);
+
+                //SHA512 encryption of Json encode and key
+                $signature = $this->apexxBaseHelper->signatureEncryptDecrypt(1, $data);
+
                 $this->customLogger->debug('Hostedpayment Success Response:', $response);
                 $transactionId = $response['_id'];
                 $status=$this->request->getParam("status");
@@ -187,13 +204,15 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
                 //$order = $this->checkoutSession->getLastRealOrder();
                 //$orderObj = $this->orderRepository->get($order->getId());
 
-                $order = $this->order->loadByIncrementId($incrId);
-                //$orderId = $order->getId();
-                $orderObj = $this->orderRepository->get($order->getId());
-                /** @var \Magento\Sales\Model\Order\Payment $payment */
-                $payment = $order->getPayment();
+                
+                //Check if signature is matched then place order
+                if (($signature == $responseSign) && ($status == 'AUTHORISED')) {
+                    $order = $this->order->loadByIncrementId($incrId);
+                    //$orderId = $order->getId();
+                    $orderObj = $this->orderRepository->get($order->getId());
+                    /** @var \Magento\Sales\Model\Order\Payment $payment */
+                    $payment = $order->getPayment();
 
-                if ($status == 'AUTHORISED') {
 
                     $payment->setLastTransId($transactionId);
                     $payment->setParentTransactionId(null);
@@ -249,6 +268,7 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
                         $this->orderSender->send($order);
                     }
                     $payment->save();
+   
                     $order->save();
                     $transaction->save();
 
@@ -261,7 +281,13 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
                         ->toHtml();
                     $this->getResponse()->setBody($block);
 
-                } elseif ($status == 'CAPTURED') {
+                } elseif (($signature == $responseSign) && ($status == 'CAPTURED')) {
+                    $order = $this->order->loadByIncrementId($incrId);
+                    //$orderId = $order->getId();
+                    $orderObj = $this->orderRepository->get($order->getId());
+                    /** @var \Magento\Sales\Model\Order\Payment $payment */
+                    $payment = $order->getPayment();
+
                     $payment->setLastTransId($transactionId);
                     $payment->setTransactionId($transactionId);
                     $payment->setIsTransactionClosed(true);
@@ -309,11 +335,12 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
                     $transaction->setIsClosed(true);
 
                     $payment->addTransactionCommentsToOrder($transaction, __('Captured amount of %1.', $order->getBaseCurrency()->formatTxt($total)));
-                    
+
                     if (!$order->getEmailSent()) {
                         $this->orderSender->send($order);
                     }
                     $payment->save();
+                      
                     $order->save();
                     $transaction->save();
 
@@ -328,6 +355,12 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
                         ->toHtml();
                     $this->getResponse()->setBody($block);
                 } else {
+                    $order = $this->order->loadByIncrementId($incrId);
+                    //$orderId = $order->getId();
+                    $orderObj = $this->orderRepository->get($order->getId());
+                    /** @var \Magento\Sales\Model\Order\Payment $payment */
+                    $payment = $order->getPayment();
+
 
                     $payment->setLastTransId($transactionId);
                     $payment->setTransactionId($transactionId);
@@ -345,7 +378,9 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
                     if(isset($response['status'])){
                         $orderStatus = strtolower($response['status']);
                         $order->setStatus($orderStatus);
+
                         
+
                         $order->save();
                     }
                     if(isset($response['message'])){
