@@ -58,8 +58,14 @@ class CancelSale implements ClientInterface
     public function placeRequest(TransferInterface $transferObject)
     {
         $request = $transferObject->getBody();
-        // Set cancel url
-        $url = $this->apexxBaseHelper->getApiEndpoint().$request['transactionId'].'/cancel';
+        $apiType = $this->apexxBaseHelper->getApiType();
+        if ($apiType == 'Atomic') {
+            $url = $this->apexxBaseHelper->getApiEndpoint().'cancel/payment/'.$request['transactionId'];
+        } else {
+            // Set cancel url
+            $url = $this->apexxBaseHelper->getApiEndpoint().$request['transactionId'].'/cancel';
+        }
+
         //Set parameters for curl
         unset($request['transactionId']);
         $resultCode = json_encode($request);
