@@ -1,7 +1,7 @@
 <?php
 namespace Apexx\HostedPayment\Controller\Index;
 
-use \Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
@@ -13,7 +13,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Checkout\Model\Session;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\OrderFactory;
-use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Psr\Log\LoggerInterface;
 use Magento\Sales\Model\Order\Payment\Transaction\Builder;
@@ -59,7 +59,7 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
     protected $orderRepository;
 
     /**
-     * @var OrderInterface
+     * @var Order
      */
     protected $order;
 
@@ -113,7 +113,7 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
      * @param UrlInterface $urlInterface
      * @param Session $checkoutSession
      * @param OrderRepository $orderRepository
-     * @param OrderInterface $order
+     * @param Order $order
      * @param OrderFactory $orderFactory
      * @param LoggerInterface $logger
      * @param Builder $transactionBuilder
@@ -132,7 +132,7 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
         UrlInterface $urlInterface,
         Session $checkoutSession,
         OrderRepository $orderRepository,
-        OrderInterface $order,
+        Order $order,
         OrderFactory $orderFactory,
         LoggerInterface $logger,
         Builder $transactionBuilder,
@@ -172,16 +172,16 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
 
             if ($post) {
                 $response = $this->request->getParams();
-                
+
                 //Signature from response
                 $responseSign = $response['signature'];
 
                 //Remove Signature parameter from response
                 unset($response['signature']);
-                
+
                 //Sort the response in ascending order
                 ksort($response);
-                
+
                 //Encode the response
                 $data = json_encode($response);
 
@@ -204,7 +204,7 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
                 //$order = $this->checkoutSession->getLastRealOrder();
                 //$orderObj = $this->orderRepository->get($order->getId());
 
-                
+
                 //Check if signature is matched then place order
                 if (($signature == $responseSign) && ($status == 'AUTHORISED')) {
                     $order = $this->order->loadByIncrementId($incrId);
@@ -268,7 +268,7 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
                         $this->orderSender->send($order);
                     }
                     $payment->save();
-   
+
                     $order->save();
                     $transaction->save();
 
@@ -340,7 +340,7 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
                         $this->orderSender->send($order);
                     }
                     $payment->save();
-                      
+
                     $order->save();
                     $transaction->save();
 
@@ -379,7 +379,7 @@ class Response extends \Magento\Framework\App\Action\Action implements CsrfAware
                         $orderStatus = strtolower($response['status']);
                         $order->setStatus($orderStatus);
 
-                        
+
 
                         $order->save();
                     }
